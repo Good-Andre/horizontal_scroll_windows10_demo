@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
             child: ScrollConfiguration(
               behavior: MouseScrollBehavior(),
               child: ScrollMouseHandler(
+                scrollDeltaDirection: -1.0, // change the direction of mouse wheel scrolling
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   primary: true, // Required for mouse wheel scroll
@@ -63,7 +64,12 @@ class MyApp extends StatelessWidget {
 
 class ScrollMouseHandler extends StatefulWidget {
   final Widget child;
-  const ScrollMouseHandler({required this.child, super.key});
+  final double scrollDeltaDirection;
+  const ScrollMouseHandler({
+  required this.child,
+  this.scrollDeltaDirection = 1.0,
+  super.key
+  });
 
   @override
   State<ScrollMouseHandler> createState() => _ScrollMouseHandlerState();
@@ -81,7 +87,7 @@ class _ScrollMouseHandlerState extends State<ScrollMouseHandler> {
   void _handlePointerSignal(PointerSignalEvent event) {
     if (event is PointerScrollEvent) {
       if (!_controller.hasClients) return;
-      final double delta = -event.scrollDelta.dy;
+      final double delta = event.scrollDelta.dy * widget.scrollDeltaDirection;
       _controller.animateTo(
         _controller.offset + delta,
         duration: const Duration(milliseconds: 80),
